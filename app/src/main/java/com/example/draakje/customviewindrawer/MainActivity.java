@@ -15,19 +15,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,MainViewFragment.OnFragmentInteractionListener, CustomViewFragment.OnFragmentInteractionListener, MoreViewsFragment.OnFragmentInteractionListener {
+
+    private NavigationView navigationView;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, drawer, mToolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        //3 bolletjes
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -77,20 +81,48 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_main_view) {
 
+            mToolbar.setTitle(R.string.title_section1);
             fragment = new MainViewFragment();
 
         } else if (id == R.id.nav_custom_view) {
 
+            mToolbar.setTitle(R.string.title_section2);
             fragment = new CustomViewFragment();
 
         } else if (id == R.id.nav_more_view) {
+
+            mToolbar.setTitle(R.string.title_section3);
             fragment = new MoreViewsFragment();
 
         }
         if (fragment !=null) {
             android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(null).commit();
+            fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+                @Override
+                public void onBackStackChanged() {
+                    Fragment f = getSupportFragmentManager().findFragmentById(R.id.container);
+                    updateTitleAndDrawer(f);
+                }
+
+                private void updateTitleAndDrawer(Fragment f) {
+                    if (f != null) {
+                        String fragClassName = f.getClass().getName();
+                        if (fragClassName.equals(MainViewFragment.class.getName())) {
+
+                            mToolbar.setTitle(R.string.title_section1);
+                        } else if (fragClassName.equals(CustomViewFragment.class.getName())) {
+                            mToolbar.setTitle(R.string.title_section2);
+                        } else if (fragClassName.equals(MoreViewsFragment.class.getName())) {
+                            mToolbar.setTitle(R.string.title_section3);
+                        }
+                        else {
+                            mToolbar.setTitle(R.string.main_fragment_text);
+                        }
+                    }
+                }});
             drawerLayout.closeDrawer(GravityCompat.START);
+
         }
         else {
             Log.e("Navigation Drawer", "Error in creating fragment");

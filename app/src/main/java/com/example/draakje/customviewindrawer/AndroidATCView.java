@@ -15,7 +15,7 @@ public class AndroidATCView extends View {
     private String mSquareText;
     private Paint mSquarePaint;
 
-    public AndroidATCView(Context context, @Nullable AttributeSet attrs) {
+    public AndroidATCView(Context context,AttributeSet attrs) {
         super(context, attrs);
         mSquarePaint = new Paint();
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AndroitATCView, 0, 0);
@@ -51,8 +51,8 @@ public class AndroidATCView extends View {
         return mSquareColor;
     }
 
-    public void setmSquareColor(int neweColor) {
-        mSquareColor = neweColor;
+    public void setmSquareColor(int newColor) {
+        mSquareColor = newColor;
         invalidate();
         requestLayout();
     }
